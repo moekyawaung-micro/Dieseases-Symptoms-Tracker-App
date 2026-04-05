@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Symptoms Checker - ရောဂါလက်ခဏာစူးစမ်းအက်ပ်</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #DC143C;
+            --secondary: #FF6B6B;
+            --accent: #FFA07A;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #FF4444;
+            --info: #17A2B8;
+            --dark: #1a1a2e;
+            --light: #ECF0F1;
+            --white: #fff;
+        }
+
+        body {
+            font-family: 'Padauk', 'Myanmar3', 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFF0E5 50%, #FFE5F0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+
+        /* ============== HEADER ============== */
+        .header {
+            background: linear-gradient(135deg, #DC143C 0%, #FF6B6B 50%, #FF8C8C 100%);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 50px rgba(220, 20, 60, 0.3);
+            animation: slideInDown 0.6s ease-out;
+            text-align: center;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .lang-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .lang-btn {
+            padding: 10px 16px;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #DC143C;
+            border-color: #DC143C;
+        }
+
+        /* ============== QUICK STATS ============== */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .quick-stat {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #DC143C;
+        }
+
+        .quick-stat-number {
+            font-size: 24px;
+            font-weight: 900;
+            color: #DC143C;
+            margin-bottom: 3px;
+        }
+
+        .quick-stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* ============== MAIN LAYOUT ============== */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* ============== SIDEBAR ============== */
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #DC143C;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #FFE5E5;
+        }
+
+        /* ============== SEARCH ============== */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #FFE5E5;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Padauk', 'Myanmar3', 'Segoe UI', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+        }
+
+        /* ============== CATEGORIES ============== */
+        .disease-categories {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .category-item {
+            padding: 12px;
+            background: #FFE5E5;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .category-item:hover {
+            transform: translateX(5px);
+            border-color: #DC143C;
+        }
+
+        .category-item.active {
+            background: linear-gradient(135deg, #DC143C 0%, #FF6B6B 100%);
+            color: white;
+            border-color: #DC143C;
+        }
+
+        /* ============== BUTTONS ============== */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Padauk', 'Myanmar3', 'Segoe UI', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #DC143C 0%, #FF6B6B 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .btn-secondary {
+            background: #FFE5E5;
+            color: #DC143C;
+            border: 2px solid #DC143C;
+        }
+
+        .btn-secondary:hover {
+            background: #DC143C;
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* ============== TABS ============== */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: 'Padauk', 'Myanmar3', 'Segoe UI', sans-serif;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #DC143C 0%, #FF6B6B 100%);
+            color: white;
+            border-color: #DC143C;
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ============== CARDS ============== */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            animation: slideInUp 0.5s ease-out;
+            transition: all 0.3s;
+            border-left: 4px solid #DC143C;
+        }
+
+        .card:hover {
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #FFE5E5;
+        }
+
+        .card-icon {
+            font-size: 36px;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #DC143C;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        /* ============== DISEASE CARD ============== */
+        .disease-card {
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #DC143C;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .disease-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.15);
+        }
+
+        .disease-card.selected {
+            background: linear-gradient(135deg, #DC143C 0%, #FF6B6B 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.3);
+        }
+
+        .disease-name {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .disease-code {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .disease-severity {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .severity-critical {
+            background: #FF4444;
+            color: white;
+        }
+
+        .severity-high {
+            background: #FFB84D;
+            color: white;
+        }
+
+        .severity-moderate {
+            background: #FFC107;
+            color: #333;
+        }
+
+        .severity-mild {
+            background: #28A745;
+            color: white;
+        }
+
+        .disease-description {
+            font-size: 12px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* ============== SYMPTOMS LIST ============== */
+        .symptoms-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .symptom-tag {
+            background: white;
+            border: 2px solid #FFE5E5;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .symptom-tag:hover {
+            transform: translateY(-2px);
+            border-color: #DC143C;
+        }
+
+        .symptom-tag.selected {
+            background: #DC143C;
+            color: white;
+            border-color: #DC143C;
+        }
+
+        .symptom-checkbox {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #DC143C;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .symptom-tag.selected .symptom-checkbox {
+            background: white;
+            color: #DC143C;
+        }
+
+        /* ============== GRID ============== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* ============== INFO BOX ============== */
+        .info-box {
+            background: linear-gradient(135deg, #FFF0E5 0%, #FFE5E5 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #DC143C;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 13px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .info-box-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .info-box-header {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* ============== TIMELINE ============== */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            padding-left: 40px;
+            padding-bottom: 25px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: #DC143C;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #DC143C;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: #FFE5E5;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: #DC143C;
+            margin-bottom: 5px;
+        }
+
+        .timeline-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* ============== STATS TABLE ============== */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #FFE5E5;
+            font-size: 13px;
+        }
+
+        .stats-table th {
+            background: #FFE5E5;
+            font-weight: 700;
+            color: #DC143C;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stats-table tr:hover {
+            background: #FFF0F0;
+        }
+
+        /* ============== BADGE ============== */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-critical {
+            background: #FFE5E5;
+            color: #FF4444;
+        }
+
+        .badge-contagious {
+            background: #FFE5F0;
+            color: #DC143C;
+        }
+
+        .badge-preventable {
+            background: #E5FFE5;
+            color: #28A745;
+        }
+
+        .badge-seasonal {
+            background: #FFFAE5;
+            color: #FFB84D;
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+                flex-direction: column;
+            }
+
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                width: 100%;
+                text-align: center;
+            }
+
+            .symptoms-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .symptoms-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #DC143C;
+            border-radius: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ============== ALERTS ============== */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 18px 22px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
+            font-family: 'Padauk', 'Myanmar3', 'Segoe UI', sans-serif;
+            font-weight: 600;
+            max-width: 350px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert.success {
+            border-left: 4px solid #28A745;
+            color: #155724;
+        }
+
+        .alert.warning {
+            border-left: 4px solid #FFB84D;
+            color: #FF8C00;
+        }
+
+        .alert.danger {
+            border-left: 4px solid #FF4444;
+            color: #DC2626;
+        }
+
+        .alert.info {
+            border-left: 4px solid #DC143C;
+            color: #C41E3A;
+        }
+
+        /* ============== MODAL ============== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border: none;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            animation: slideInUp 0.3s ease-out;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 800;
+            color: #DC143C;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #FFE5E5;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .close {
+            color: #DC143C;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            color: #FF4444;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #FFE5E5;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        .comparison-table th {
+            background: #FFE5E5;
+            color: #DC143C;
+            font-weight: 700;
+        }
+
+        .comparison-table tr:hover {
+            background: #FFF0F0;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>
+            <span style="font-size: 40px;">🏥</span>
+            Disease Symptoms Checker
+        </h1>
+        <p id="headerSub">ရောဂါလက်ခဏာမှတ်သားသည့်အက်ပ်</p>
+        <div class="lang-selector">
+            <button class="lang-btn active" onclick="setLanguage('my')" id="myBtn">MY</button>
+            <button class="lang-btn" onclick="setLanguage('en')" id="enBtn">EN</button>
+            <button class="lang-btn" onclick="setLanguage('th')" id="thBtn">TH</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- QUICK STATS -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <div class="quick-stat-number" id="totalDiseases">0</div>
+                <div class="quick-stat-label">စုစုပေါင်းရောဂါ</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-number" id="criticalDiseases">0</div>
+                <div class="quick-stat-label">အရေးကြီး</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-number" id="contagiousDiseases">0</div>
+                <div class="quick-stat-label">ကူးစက်ခြင်း</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-number" id="preventableDiseases">0</div>
+                <div class="quick-stat-label">တားဆစ်ခွင့်</div>
+            </div>
+        </div>
+
+        <!-- MAIN LAYOUT -->
+        <div class="main-layout">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="sidebar-title">
+                    <span>🔍</span>
+                    <span id="searchTitle">ရောဂါရှာစေတင်ခြင်း</span>
+                </div>
+
+                <!-- SEARCH -->
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="ရောဂါအမည် ရှာပါ..." onkeyup="filterDiseases()">
+                </div>
+
+                <!-- CATEGORIES -->
+                <div class="sidebar-title" style="margin-top: 20px;">
+                    <span>📂</span>
+                    <span id="categoriesTitle">အုပ်စုများ</span>
+                </div>
+
+                <div class="disease-categories" id="categoriesList"></div>
+            </div>
+
+            <!-- CONTENT -->
+            <div>
+                <!-- NAVIGATION TABS -->
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchTab('browse')" id="browseTab">📚 Browse</button>
+                    <button class="nav-tab" onclick="switchTab('checker')" id="checkerTab">🔍 Checker</button>
+                    <button class="nav-tab" onclick="switchTab('comparison')" id="comparisonTab">📊 ယှဉ်ပြိုင်ခြင်း</button>
+                    <button class="nav-tab" onclick="switchTab('prevention')" id="preventionTab">🛡️ အတားအဆစ်</button>
+                </div>
+
+                <!-- BROWSE TAB -->
+                <div id="browse" class="tab-content active">
+                    <div id="diseasesList"></div>
+                </div>
+
+                <!-- CHECKER TAB -->
+                <div id="checker" class="tab-content hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🔍</div>
+                            <div>
+                                <div class="card-title" id="checkerTitle">လက်ခဏာစူးစမ်းခြင်း</div>
+                                <div class="card-subtitle">သင်ခံစားနေသောလက်ခဏာများကိုရွေးချယ်ပါ</div>
+                            </div>
+                        </div>
+
+                        <label style="font-weight: 700; color: #DC143C; margin-bottom: 15px; display: block;">
+                            ✓ သင်ခံစားနေသောလက်ခဏာများ
+                        </label>
+
+                        <div class="symptoms-list" id="allSymptomsList"></div>
+
+                        <button class="btn btn-primary btn-block" style="margin-top: 20px;" onclick="performSymptomCheck()">
+                            🔍 <span id="checkBtnText">စူးစမ်းခြင်း</span>
+                        </button>
+
+                        <div id="checkerResults" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+
+                <!-- COMPARISON TAB -->
+                <div id="comparison" class="tab-content hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">📊</div>
+                            <div>
+                                <div class="card-title" id="comparisonTitle">ရောဂါယှဉ်ပြိုင်ခြင်း</div>
+                                <div class="card-subtitle">ရောဂါများ၏ လက်ခဏာများကိုယှဉ်ပြိုင်ပါ</div>
+                            </div>
+                        </div>
+
+                        <div id="comparisonContent"></div>
+                    </div>
+                </div>
+
+                <!-- PREVENTION TAB -->
+                <div id="prevention" class="tab-content hidden">
+                    <div class="grid-2" id="preventionContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DISEASE DETAIL MODAL -->
+        <div id="diseaseModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDiseaseModal()">&times;</span>
+                <div id="diseaseDetailContent"></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: #999; padding: 30px; margin-top: 30px; font-size: 12px;">
+            <p>🏥 Disease Symptoms Checker | Medical Information 2024</p>
+            <p id="disclaimerText">⚠️ ဤအက်ပ်သည်အချက်အလက်ရည်ရွယ်ချက်သာဖြစ်သည်။ ကျန်းမာရေးအကြံအစည်များအတွက်ဆရာဝန်ထံသွားပါ</p>
+        </div>
+    </div>
+
+    <script>
+        // ============== TRANSLATIONS ==============
+        const translations = {
+            my: {
+                headerSub: 'ရောဂါလက်ခဏာမှတ်သားသည့်အက်ပ်',
+                disclaimerText: 'ဤအက်ပ်သည်အချက်အလက်ရည်ရွယ်ချက်သာဖြစ်သည်။ ကျန်းမာရေးအကြံအစည်များအတွက်ဆရာဝန်ထံသွားပါ',
+            },
+            en: {
+                headerSub: 'Disease Symptoms Checker Application',
+                disclaimerText: 'This app is for informational purposes only. Please consult a doctor for medical advice',
+            },
+            th: {
+                headerSub: 'แอปพลิเคชันตรวจสอบอาการโรค',
+                disclaimerText: 'แอปนี้เป็นเพื่อจุดประสงค์ข้อมูลเท่านั้น โปรดปรึกษาแพทย์สำหรับคำแนะนำทางการแพทย์',
+            }
+        };
+
+        // ============== DISEASE DATABASE ==============
+        const diseasesDatabase = [
+            // အဖြားရောဂါ
+            {
+                id: 1,
+                name: 'အဖြားရောဂါ (Flu)',
+                localName: 'အဖြားရောဂါ',
+                code: 'J11',
+                category: 'ဗိုင်းရပ်စ်ရောဂါ',
+                severity: 'moderate',
+                contagious: true,
+                preventable: true,
+                emoji: '🤒',
+                symptoms: ['ခေါင်းကိုက်ခြင်း', 'ဘာသာစကားသိုက်ခြင်း', 'ခြင်းခြင်း', 'အကျီအုပ်တွင်နာကျင်ခြင်း', 'ချစ်စုံအယ်မီခြင်း'],
+                transmission: 'အလေး အုံ ဖြန့်ဝေခြင်း',
+                incubation: '1-4 ရက်',
+                treatment: 'နေရာမှာ အနားယူခြင်း၊ အရည်အမျိုးမျိုးအုံခြင်း',
+                duration: '5-7 ရက်',
+                prevention: ['ကျန်းမာရေးစီမံခန့်ခွဲခြင်း', 'သကုံတွင်ဆက်သွယ်မှု ရှောင်ခြင်း'],
+                diagnosis: 'အဖြားလက်ခဏာ အခြေခံ သို့မဟုတ် အဖြားစမ်းသပ်မှု',
+                complications: ['နံရံရောင်ဝင်ခြင်း', 'နားခွင်းရောင်'],
+                riskGroups: ['အသက်အီမျှ', 'ကလေးများ', 'အကျိုးအကျေးများ'],
+                description: 'အဖြားရောဂါသည် ဗိုင်းရပ်စ်ကြောင့်ဖြစ်သည့်ရောဂါ'
+            },
+            {
+                id: 2,
+                name: 'အအေးလူနာ (Common Cold)',
+                localName: 'အအေးလူနာ',
+                code: 'J00',
+                category: 'ဗိုင်းရပ်စ်ရောဂါ',
+                severity: 'mild',
+                contagious: true,
+                preventable: true,
+                emoji: '🤧',
+                symptoms: ['နှာခေါင်းဖုံ', 'ခြင်းခြင်း', 'ကျောင်းအနီခြင်း', 'ခေါင်းကိုက်ခြင်း'],
+                transmission: 'အလေးအုံ ဖြန့်ဝေခြင်း',
+                incubation: '1-3 ရက်',
+                treatment: 'အနားယူခြင်း၊ အရည်အမျိုးမျိုးအုံခြင်း',
+                duration: '3-10 ရက်',
+                prevention: ['လက်ဆေးခြင်း', 'သကုံမှာကျုံးခြင်း'],
+                diagnosis: 'အအေးလူနာလက်ခဏာ အခြေခံ',
+                complications: ['နံရံရောင်ဝင်ခြင်း'],
+                riskGroups: ['ကလေးများ', 'အသက်ကြီးများ'],
+                description: 'အအေးလူနာသည် အများဆုံးတွေ့ရှိရသည့် ဗိုင်းရပ်စ်ရောဂါ'
+            },
+            {
+                id: 3,
+                name: 'ကိုရိုနာဗိုင်းရပ်စ် (COVID-19)',
+                localName: 'ကိုရိုနာ',
+                code: 'U07.1',
+                category: 'ဗိုင်းရပ်စ်ရောဂါ',
+                severity: 'critical',
+                contagious: true,
+                preventable: true,
+                emoji: '😷',
+                symptoms: ['အအေးခြင်း', 'ချစ်စုံ', 'အည်အာ', 'အရသာစုံခြင်း', 'အမြင်စုံခြင်း'],
+                transmission: 'အလေးအုံ ဖြန့်ဝေခြင်း',
+                incubation: '2-14 ရက်',
+                treatment: 'အနားယူခြင်း၊ အရည်အမျိုးမျိုးအုံခြင်း',
+                duration: '2 အပတ်သည် ၁ လ',
+                prevention: ['ကာတည်ခြင်း', 'လက်ဆေးခြင်း', 'အကွာအဝေးထိန်းချုပ်ခြင်း'],
+                diagnosis: 'PCR စမ်းသပ်မှု',
+                complications: ['အဖြူကြီးအုံခြင်း', 'နှလုံးအခက်အခဲ'],
+                riskGroups: ['အသက်ကြီးများ', 'အုတ်လည်ခြင်း ရောဂါ'],
+                description: 'ကိုရိုနာဗိုင်းရပ်စ်သည် ၂၀၁၉ ခုနှစ်တွင်ရှေ့ပြေးဝင်ခြင်း'
+            },
+            {
+                id: 4,
+                name: 'အဖြူကြီးအုံခြင်း (Pneumonia)',
+                localName: 'အဖြူကြီးအုံခြင်း',
+                code: 'J18',
+                category: 'အဖြူရောင်ဝင်ခြင်း',
+                severity: 'critical',
+                contagious: true,
+                preventable: true,
+                emoji: '🫁',
+                symptoms: ['ချစ်စုံ', 'ရုံ့သည့်အုံခြင်း', 'ခေါင်းကိုက်ခြင်း', 'အည်အာ'],
+                transmission: 'အလေးအုံ ဖြန့်ဝေခြင်း',
+                incubation: '1-3 ရက်',
+                treatment: 'အန္တရာယ်ဆေး၊ အနားယူခြင်း',
+                duration: '2-4 အပတ်',
+                prevention: ['အဖြူကြီးအုံခြင်း ကာတည်ခြင်း', 'ကျန်းမာရေးစီမံခန့်ခွဲခြင်း'],
+                diagnosis: 'မြင်သည့် အရည်အလေး',
+                complications: ['အဆစ်မခြင်း', 'အလွယ်တကူအုံခြင်း'],
+                riskGroups: ['အသက်ကြီးများ', 'ကလေးများ'],
+                description: 'အဖြူကြီးအုံခြင်းသည် အဖြူတွင်ကျေးဇူးခြင်း'
+            },
+            {
+                id: 5,
+                name: 'ဝက်ဆင်ခြင်း (Dengue Fever)',
+                localName: 'ဝက်ဆင်ခြင်း',
+                code: 'A90',
+                category: 'အိုင်းအေ့စ်ကြောင့်ရောဂါ',
+                severity: 'high',
+                contagious: false,
+                preventable: true,
+                emoji: '🦟',
+                symptoms: ['တကြီးအပူခြင်း', 'ခေါင်းကိုက်ခြင်း', 'အကျီအုပ်တွင်နာကျင်ခြင်း', 'အရည်ကျခြင်း'],
+                transmission: 'အိုင်းအေ့စ်ကြောင့်',
+                incubation: '4-10 ရက်',
+                treatment: 'အနားယူခြင်း၊ အရည်အမျိုးမျိုးအုံခြင်း',
+                duration: '7-10 ရက်',
+                prevention: ['အိုင်းအေ့စ်ကြောင့် အုံခြင်း', 'အိုင်းအေ့စ်ကြောင့်အစုံခြင်း'],
+                diagnosis: 'သွေးစမ်းသပ်မှု',
+                complications: ['အဝါကြီးအုံခြင်း', 'အသုံးအည်ခြင်း'],
+                riskGroups: ['အကျေးမြို့အရ'],
+                description: 'ဝက်ဆင်ခြင်းသည် အိုင်းအေ့စ်ကြောင့်ဖြစ်သည့်ရောဂါ'
+            },
+            {
+                id: 6,
+                name: 'အဝါကြီးအုံခြင်း (Hepatitis)',
+                localName: 'အဝါကြီးအုံခြင်း',
+                code: 'B19',
+                category: 'အည်အုံခြင်း',
+                severity: 'high',
+                contagious: true,
+                preventable: true,
+                emoji: '🏥',
+                symptoms: ['အဝါရောင်ခြင်း', 'အည်အုံခြင်း', 'အည်အာခြင်း', 'အသည်တဖြူခြင်း'],
+                transmission: 'သွေးမှ သို့မဟုတ် အည်ထဲမှ',
+                incubation: '15-50 ရက်',
+                treatment: 'အနားယူခြင်း',
+                duration: '4-12 အပတ်',
+                prevention: ['အဝါကြီးအုံခြင်း ကာတည်ခြင်း'],
+                diagnosis: 'သွေးစမ်းသပ်မှု',
+                complications: ['အည်အုံခြင်းအခက်အခဲ'],
+                riskGroups: ['ပုံမှန်အုံခြင်း'],
+                description: 'အဝါကြီးအုံခြင်းသည် အည်တွင်ကျေးဇူးခြင်း'
+            },
+            {
+                id: 7,
+                name: 'သန္ဒေါ (Malaria)',
+                localName: 'သန္ဒေါ',
+                code: 'B54',
+                category: 'ခြင်ကြောင့်ရောဂါ',
+                severity: 'critical',
+                contagious: false,
+                preventable: true,
+                emoji: '🦟',
+                symptoms: ['တကြီးအပူခြင်း', 'အအေးခြင်း', 'အချွတ်ခြင်း', 'ခေါင်းကိုက်ခြင်း'],
+                transmission: 'သန္ဒေါခြင်းကြောင့်',
+                incubation: '10-14 ရက်',
+                treatment: 'သန္ဒေါဆေး',
+                duration: '2-3 အပတ်',
+                prevention: ['သန္ဒေါခြင်းအုံခြင်း', 'မုံးဒုံခြင်း'],
+                diagnosis: 'သွေးစမ်းသပ်မှု',
+                complications: ['နှလုံးအခက်အခဲ', 'အဖြူကြီးအုံခြင်း'],
+                riskGroups: ['အိုင်း့စ်အ့စ်'],
+                description: 'သန္ဒေါသည် သန္ဒေါခြင်းကြောင့်ဖြစ်သည့်ရောဂါ'
+            },
+            {
+                id: 8,
+                name: 'ခြင်ကိုက်ခြင်း (Chickenpox)',
+                localName: 'ခြင်ကိုက်ခြင်း',
+                code: 'B01',
+                category: 'ဗိုင်းရပ်စ်ရောဂါ',
+                severity: 'moderate',
+                contagious: true,
+                preventable: true,
+                emoji: '🔴',
+                symptoms: ['အမြင်စုံခြင်း', 'အအေးခြင်း', 'အည်ခြင်း', 'ခေါင်းကိုက်ခြင်း'],
+                transmission: 'အလေးအုံ ဖြန့်ဝေခြင်း',
+                incubation: '10-21 ရက်',
+                treatment: 'အနားယူခြင်း',
+                duration: '7-10 ရက်',
+                prevention: ['ခြင်ကိုက်ခြင်း ကာတည်ခြင်း'],
+                diagnosis: 'အမြင်ခြင်းအခြေခံ',
+                complications: ['အခြင်းကျင့်ခြင်း', 'အူညီခြင်း'],
+                riskGroups: ['ကလေးများ'],
+                description: 'ခြင်ကိုက်ခြင်းသည် အများအပြားကလေးများစုံခြင်းရောဂါ'
+            },
+            {
+                id: 9,
+                name: 'သျောက်ကြီးအုံခြင်း (Mumps)',
+                localName: 'သျောက်ကြီးအုံခြင်း',
+                code: 'B26',
+                category: 'ဗိုင်းရပ်စ်ရောဂါ',
+                severity: 'moderate',
+                contagious: true,
+                preventable: true,
+                emoji: '😫',
+                symptoms: ['သျောက်ကြီးအုံခြင်း', 'အအေးခြင်း', 'ခေါင်းကိုက်ခြင်း', 'သုံးခြင်း'],
+                transmission: 'အလေးအုံ ဖြန့်ဝေခြင်း',
+                incubation: '12-25 ရက်',
+                treatment: 'အနားယူခြင်း',
+                duration: '7-10 ရက်',
+                prevention: ['သျောက်ကြီးအုံခြင်း ကာတည်ခြင်း'],
+                diagnosis: 'အမြင်ခြင်းအခြေခံ',
+                complications: ['နားသည်းခြင်း', 'သိုးအုံခြင်း'],
+                riskGroups: ['ကလေးများ'],
+                description: 'သျောက်ကြီးအုံခြင်းသည် သျောက်နီရောင်ဝင်ခြင်း'
+            },
+            {
+                id: 10,
+                name: 'ခြင်ကိုက်ခြင်း (Measles)',
+                localName: 'ခြင်ကိုက်ခြင်း',
+                code: 'B05',
+                category: 'ဗိုင်းရပ်စ်ရောဂါ',
+                severity: 'high',
+                contagious: true,
+                preventable: true,
+                emoji: '🔴',
+                symptoms: ['အမြင်စုံခြင်း', 'အအေးခြင်း', 'ကျောင်းအနီခြင်း', 'ခေါင်းကိုက်ခြင်း'],
+                transmission: 'အလေးအုံ ဖြန့်ဝေခြင်း',
+                incubation: '10-14 ရက်',
+                treatment: 'အနားယူခြင်း',
+                duration: '7-10 ရက်',
+                prevention: ['ခြင်ကိုက်ခြင်း ကာတည်ခြင်း'],
+                diagnosis: 'အမြင်ခြင်းအခြေခံ',
+                complications: ['အဖြူကြီးအုံခြင်း', 'နားကျင်းခြင်း'],
+                riskGroups: ['ကလေးများ'],
+                description: 'ခြင်ကိုက်ခြင်းသည် အခြင်းကျင့်ခြင်းရောဂါ'
+            }
+        ];
+
+        // ============== STATE ==============
+        let state = {
+            currentLanguage: 'my',
+            selectedCategory: '',
+            selectedSymptoms: [],
+            filteredDiseases: [...diseasesDatabase]
+        };
+
+        // ============== INITIALIZATION ==============
+        function init() {
+            setLanguage('my');
+            updateStats();
+            renderCategories();
+            renderDiseasesList();
+            renderSymptomsList();
+        }
+
+        // ============== LANGUAGE ==============
+        function setLanguage(lang) {
+            state.currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            if (lang === 'my') document.getElementById('myBtn').classList.add('active');
+            else if (lang === 'en') document.getElementById('enBtn').classList.add('active');
+            else document.getElementById('thBtn').classList.add('active');
+            updateUI();
+        }
+
+        function updateUI() {
+            const t = translations[state.currentLanguage] || translations['en'];
+            document.getElementById('headerSub').textContent = t.headerSub;
+            document.getElementById('disclaimerText').textContent = t.disclaimerText;
+        }
+
+        // ============== STATS ==============
+        function updateStats() {
+            const critical = diseasesDatabase.filter(d => d.severity === 'critical').length;
+            const contagious = diseasesDatabase.filter(d => d.contagious).length;
+            const preventable = diseasesDatabase.filter(d => d.preventable).length;
+
+            document.getElementById('totalDiseases').textContent = diseasesDatabase.length;
+            document.getElementById('criticalDiseases').textContent = critical;
+            document.getElementById('contagiousDiseases').textContent = contagious;
+            document.getElementById('preventableDiseases').textContent = preventable;
+        }
+
+        // ============== RENDER CATEGORIES ==============
+        function renderCategories() {
+            const categories = [...new Set(diseasesDatabase.map(d => d.category))];
+            let html = `<div class="category-item active" onclick="filterByCategory('')">📌 အားလုံး</div>`;
+            
+            categories.forEach(cat => {
+                html += `<div class="category-item" onclick="filterByCategory('${cat}')">${cat}</div>`;
+            });
+
+            document.getElementById('categoriesList').innerHTML = html;
+        }
+
+        // ============== FILTER BY CATEGORY ==============
+        function filterByCategory(category) {
+            state.selectedCategory = category;
+            document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.category-item')?.classList.add('active');
+
+            if (category === '') {
+                state.filteredDiseases = [...diseasesDatabase];
+            } else {
+                state.filteredDiseases = diseasesDatabase.filter(d => d.category === category);
+            }
+
+            renderDiseasesList();
+        }
+
+        // ============== FILTER DISEASES ==============
+        function filterDiseases() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            state.filteredDiseases = diseasesDatabase.filter(d =>
+                d.name.toLowerCase().includes(searchTerm) ||
+                d.localName.toLowerCase().includes(searchTerm) ||
+                d.symptoms.some(s => s.toLowerCase().includes(searchTerm))
+            );
+            renderDiseasesList();
+        }
+
+        // ============== RENDER DISEASES LIST ==============
+        function renderDiseasesList() {
+            let html = '';
+            state.filteredDiseases.forEach(disease => {
+                const severityClass = `severity-${disease.severity}`;
+                html += `
+                    <div class="card" style="cursor: pointer;" onclick="showDiseaseDetail(${disease.id})">
+                        <div class="card-header">
+                            <div class="card-icon">${disease.emoji}</div>
+                            <div style="flex: 1;">
+                                <div class="card-title">${disease.name}</div>
+                                <div style="font-size: 11px; color: #999;">
+                                    ${disease.category} | ကုဒ်: ${disease.code}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                ${disease.contagious ? '<span class="badge badge-contagious">ကူးစက်</span>' : ''}
+                                ${disease.preventable ? '<span class="badge badge-preventable">တားဆစ်</span>' : ''}
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <span class="disease-severity ${severityClass}">
+                                ${disease.severity.toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="disease-description">${disease.description}</div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #999;">
+                            <strong>လက်ခဏာ:</strong> ${disease.symptoms.slice(0, 2).join(', ')}...
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('diseasesList').innerHTML = html || '<p style="text-align: center; color: #999;">အချက်အလက်မရှိ</p>';
+        }
+
+        // ============== SHOW DISEASE DETAIL ==============
+        function showDiseaseDetail(diseaseId) {
+            const disease = diseasesDatabase.find(d => d.id === diseaseId);
+            if (!disease) return;
+
+            let html = `
+                <div class="modal-header">
+                    ${disease.emoji} ${disease.name}
+                </div>
+                <div class="modal-body">
+                    <div class="info-box">
+                        <div class="info-box-icon">📋</div>
+                        <div>
+                            <div class="info-box-header">${disease.description}</div>
+                            <div style="margin-top: 8px;">
+                                <strong>ကုဒ်:</strong> ${disease.code}<br>
+                                <strong>အုပ်စု:</strong> ${disease.category}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">🔴 အခြင်းအရေး</h4>
+                        <span class="disease-severity severity-${disease.severity}">
+                            ${disease.severity.toUpperCase()}
+                        </span>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">🔍 လက်ခဏာများ</h4>
+                        <div class="symptoms-list">
+                            ${disease.symptoms.map(s => `<div class="symptom-tag" style="border-color: #DC143C;"><span style="font-weight: 700;">✓</span> ${s}</div>`).join('')}
+                        </div>
+                    </div>
+
+                    <table class="stats-table">
+                        <tr>
+                            <th>အချက်အလက်</th>
+                            <th>အသေးစိတ်</th>
+                        </tr>
+                        <tr>
+                            <td>ကူးစက်ခြင်း</td>
+                            <td>${disease.transmission}</td>
+                        </tr>
+                        <tr>
+                            <td>အုံမုံအချိန်</td>
+                            <td>${disease.incubation}</td>
+                        </tr>
+                        <tr>
+                            <td>ကုသမှု</td>
+                            <td>${disease.treatment}</td>
+                        </tr>
+                        <tr>
+                            <td>ကြာချိန်</td>
+                            <td>${disease.duration}</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">🛡️ အတားအဆစ်</h4>
+                        <div style="padding: 12px; background: #FFF0F0; border-radius: 8px; border-left: 3px solid #DC143C;">
+                            ${disease.prevention.map(p => `<div style="margin-bottom: 6px;">✓ ${p}</div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">⚠️ နောက်ဆက်တွဲအခက်အခဲများ</h4>
+                        <div style="padding: 12px; background: #FFF0F0; border-radius: 8px; border-left: 3px solid #FF4444;">
+                            ${disease.complications.map(c => `<div style="margin-bottom: 6px;">• ${c}</div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">👥 အဆိုးအရွံ့အုပ်စုများ</h4>
+                        <div style="padding: 12px; background: #FFF0F0; border-radius: 8px; border-left: 3px solid #FFB84D;">
+                            ${disease.riskGroups.map(g => `<div style="margin-bottom: 6px;">⚠️ ${g}</div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('diseaseDetailContent').innerHTML = html;
+            document.getElementById('diseaseModal').style.display = 'block';
+        }
+
+        function closeDiseaseModal() {
+            document.getElementById('diseaseModal').style.display = 'none';
+        }
+
+        // ============== SYMPTOMS LIST ==============
+        function renderSymptomsList() {
+            const allSymptoms = [...new Set(diseasesDatabase.flatMap(d => d.symptoms))];
+            let html = '';
+            
+            allSymptoms.forEach(symptom => {
+                html += `
+                    <div class="symptom-tag" onclick="toggleSymptom('${symptom}')">
+                        ${symptom}
+                        <span class="symptom-checkbox"></span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('allSymptomsList').innerHTML = html;
+        }
+
+        function toggleSymptom(symptom) {
+            const index = state.selectedSymptoms.indexOf(symptom);
+            if (index > -1) {
+                state.selectedSymptoms.splice(index, 1);
+            } else {
+                state.selectedSymptoms.push(symptom);
+            }
+
+            document.querySelectorAll('.symptom-tag').forEach(tag => {
+                if (tag.textContent.includes(symptom)) {
+                    tag.classList.toggle('selected');
+                }
+            });
+        }
+
+        // ============== SYMPTOM CHECKER ==============
+        function performSymptomCheck() {
+            if (state.selectedSymptoms.length === 0) {
+                showAlert('⚠️ လက်ခဏာအနည်းဆုံး ၁ခုရွေးချယ်ပါ', 'warning');
+                return;
+            }
+
+            const matches = diseasesDatabase.map(disease => {
+                const matchCount = state.selectedSymptoms.filter(symptom =>
+                    disease.symptoms.includes(symptom)
+                ).length;
+                
+                const matchPercentage = (matchCount / state.selectedSymptoms.length) * 100;
+                
+                return {
+                    disease,
+                    matches: matchCount,
+                    percentage: matchPercentage
+                };
+            }).filter(result => result.matches > 0)
+             .sort((a, b) => b.percentage - a.percentage)
+             .slice(0, 5);
+
+            let html = '<div style="margin-top: 20px;"><h4 style="color: #DC143C; margin-bottom: 15px; font-weight: 700;">🔍 ကျေးဇူးပြုသည့်ရောဂါများ</h4>';
+
+            if (matches.length === 0) {
+                html += '<p style="color: #999; text-align: center; padding: 20px;">ကိုက်ညီသည့်ရောဂါမရှိ</p>';
+            } else {
+                matches.forEach((result, idx) => {
+                    html += `
+                        <div style="background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%); border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 4px solid #DC143C; cursor: pointer;" onclick="showDiseaseDetail(${result.disease.id})">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-weight: 700; font-size: 14px; color: #DC143C;">
+                                    ${idx + 1}. ${result.disease.name}
+                                </div>
+                                <div style="background: #DC143C; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 12px;">
+                                    ${result.percentage.toFixed(0)}%
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
+                                ${result.disease.description}
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                ${result.disease.contagious ? '<span class="badge badge-contagious">ကူးစက်</span>' : ''}
+                                ${result.disease.preventable ? '<span class="badge badge-preventable">တားဆစ်</span>' : ''}
+                                <span class="badge" style="background: #FFE5E5; color: #DC143C;">ကိုက်ညီ: ${result.matches}/${state.selectedSymptoms.length}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += '</div>';
+            document.getElementById('checkerResults').innerHTML = html;
+        }
+
+        // ============== COMPARISON ==============
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tab).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.nav-tab')?.classList.add('active');
+
+            if (tab === 'comparison') renderComparison();
+            if (tab === 'prevention') renderPrevention();
+        }
+
+        function renderComparison() {
+            const topDiseases = diseasesDatabase.slice(0, 4);
+            
+            let html = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>အချက်အလက်</th>
+                            ${topDiseases.map(d => `<th style="text-align: center;">${d.emoji} ${d.name}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>အခြင်းအရေး</strong></td>
+                            ${topDiseases.map(d => `<td style="text-align: center;"><span class="disease-severity severity-${d.severity}">${d.severity.toUpperCase()}</span></td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td><strong>ကူးစက်ခြင်း</strong></td>
+                            ${topDiseases.map(d => `<td style="text-align: center;">${d.contagious ? '✓ ကူးစက်' : '✗ မကူးစက်'}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td><strong>အုံမုံအချိန်</strong></td>
+                            ${topDiseases.map(d => `<td style="text-align: center;">${d.incubation}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td><strong>ကြာချိန်</strong></td>
+                            ${topDiseases.map(d => `<td style="text-align: center;">${d.duration}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td><strong>ကူးစက်သည့်နည်း</strong></td>
+                            ${topDiseases.map(d => `<td style="font-size: 12px;">${d.transmission}</td>`).join('')}
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('comparisonContent').innerHTML = html;
+        }
+
+        function renderPrevention() {
+            let html = '';
+            diseasesDatabase.slice(0, 6).forEach(disease => {
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">${disease.emoji}</div>
+                            <div class="card-title" style="font-size: 18px;">${disease.name}</div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">🛡️ အတားအဆစ်နည်းများ</h4>
+                            <div style="padding: 12px; background: #FFF0F0; border-radius: 8px; border-left: 3px solid #DC143C;">
+                                ${disease.prevention.map(p => `<div style="margin-bottom: 8px; font-size: 13px;">✓ ${p}</div>`).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: #DC143C; margin-bottom: 10px; font-weight: 700;">📋 အုံမုံအချိန်</h4>
+                            <div style="padding: 10px; background: #E5F7FF; border-radius: 8px; color: #0066CC;">
+                                ${disease.incubation}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('preventionContent').innerHTML = html;
+        }
+
+        // ============== UTILITIES ==============
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = `<span style="font-size: 18px;">${
+                type === 'success' ? '✓' :
+                type === 'warning' ? '⚠️' :
+                type === 'danger' ? '🚨' :
+                'ℹ️'
+            }</span><span>${message}</span>`;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('diseaseModal');
+            if (event.target === modal) closeDiseaseModal();
+        });
+
+        // ============== INITIALIZATION ==============
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
+```
+ဤ **Disease Symptoms Checker** သည် ရောဂါများ၏လက်ခဏာများကို မှတ်သားနိုင်ပါသည်။ 🏥✨
